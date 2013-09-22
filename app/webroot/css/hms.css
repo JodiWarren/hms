@@ -242,6 +242,11 @@ table td.actions a {
 	padding:2px 5px;
 }
 
+table td.negative {
+	background: #c43c35;
+	color: #FFFFFF;
+}
+
 /* SQL log */
 .cake-sql-log {
 	background: #fff;

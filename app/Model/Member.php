@@ -47,6 +47,10 @@
 	    	'Pin' => array(
 	            'className' => 'Pin',
 	        ),
+	        'RfidTag'	=>	array(
+	        	'order' => 'RfidTag.state ASC',
+	        	'className'	=>	'RfidTag',
+	        ),
 	    );
 
 	    //! We have and belong to many Group.

@@ -847,6 +847,7 @@
 
 					    	$this->Nav->add('Edit', 'members', 'edit', array( $id ) );
 					        $this->Nav->add('Change Password', 'members', 'changePassword', array( $id ) );
+					        $this->Nav->add('Hackspace Access', 'access', 'view', array( $id ));
 
 					        foreach ($this->_getActionsForMember($id) as $action) 
 					        {
