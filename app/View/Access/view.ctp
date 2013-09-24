@@ -63,22 +63,25 @@
 
 <?php
 
-if ($activeCards < 3 && $pin['state'] == "Active")
+if ($activeCards < 3)
 {
-?>
-<p>To register a new card, you simply need to take it to the Hackspace, and follow these simple steps.</p>
-<ul>
-	<li>Hold it up to the card reader and wiat until the display says "Access denied".</li>
-	<li>Enter your enrollment pin: <strong><?php echo($pin['pin']); ?></strong>, and the card will be registered.</li>
-	<li>You can then come back to this page to name your card.</li>
-</ul>
-<?php
-}
-elseif ($activeCards < 3 && $pin['state'] == "Inactive")
-{
-?>
-<p>Before you can register a new card, you need to reactivate your enrollment pin,</p>
-<?php
+	if ($pin['isActive'])
+	{
+		?>
+		<p>To register a new card, you simply need to take it to the Hackspace, and follow these simple steps.</p>
+		<ul>
+			<li>Hold it up to the card reader and wiat until the display says "Access denied".</li>
+			<li>Enter your enrollment pin: <strong><?php echo($pin['pin']); ?></strong>, and the card will be registered.</li>
+			<li>You can then come back to this page to name your card.</li>
+		</ul>
+		<?php
+	}
+	else
+	{
+		?>
+		<p>Before you can register a new card, you need to reactivate your enrollment pin,</p>
+		<?php
+	}
 }
 else
 {

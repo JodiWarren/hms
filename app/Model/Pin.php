@@ -43,9 +43,13 @@
 	        		'rule' => array('between', 1, 11),
 	        		'message' => 'State must be between 1 and 11 characters long',
 	        	),
-	        	'content' => array(
-	        		'rule' => 'numeric',
+	        	'type' => array(
+	        		'rule' => 'naturalNumber',
 	        		'message' => 'State must be a number',
+	        	),
+	        	'content' => array(
+	        		'rule' => array('inList', array(10, 20, 30, 40)),
+	        		'message' => 'State can only be 10, 20, 30 or 40',
 	        	),
 	        ),
 	        'member_id' => array(
@@ -54,7 +58,7 @@
 	        		'message' => 'Member id must be no more than 11 characters long',
 	        	),
 	        	'content' => array(
-	        		'rule' => 'numeric',
+	        		'rule' => 'naturalNumber',
 	        		'message' => 'Member id must be a number',
 	        	),
 	        ),

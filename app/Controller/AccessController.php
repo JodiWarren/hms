@@ -27,7 +27,6 @@ class AccessController extends AppController
 	*/
 	public function isAuthorized($user, $request)
 	{
-		Controller::loadModel('Member');
 		if(parent::isAuthorized($user, $request))
 		{
 			return true;
@@ -48,7 +47,8 @@ class AccessController extends AppController
 		}
 		else
 		{
-			$currentMember = $viewedMemberIsCurrent = false;
+			$currentMember = false;
+			$viewedMemberIsCurrent = false;
 		}
 
 		switch ($request->action) 
@@ -127,9 +127,9 @@ class AccessController extends AppController
 					// this will do!
 					$pin = array
 					(
-						'id'	=>	Hash::get($testPin, 'pin_id'),
-						'pin'	=>	Hash::get($testPin, 'pin'),
-						'state'	=>	$state == Pin::STATE_ENROLL ? "Active" : "Inactive",
+						'id'		=>	Hash::get($testPin, 'pin_id'),
+						'pin'		=>	Hash::get($testPin, 'pin'),
+						'isActive'	=>	$state == Pin::STATE_ENROLL ? true : false,
 					);
 					break;
 				}
