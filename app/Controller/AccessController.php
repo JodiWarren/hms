@@ -113,36 +113,24 @@ class AccessController extends AppController
 		$this->set('rfidtags', $rfidtags);
 		$this->set('activeCards', $activeCards);
 
-		// Time for the pins.
-		// we only need the pin that can be used for enrollment.
-		// a user should always have 1 and only 1 pin that can be used for enrollment
+		// Now to extract the Pin
+		// We might not have an enrollment pin
 		$pin = false;
 		if(array_key_exists('Pin', $rawMemberInfo))
 		{
-			foreach ($rawMemberInfo['Pin'] as $testPin) 
+			$state = Hash::get($rawMemberInfo, 'Pin.state');
+			if ($state == Pin::STATE_ENROLL || $state == Pin::STATE_CANCELLED)
 			{
-				$state = Hash::get($testPin, 'state');
-				if ($state == Pin::STATE_ENROLL || $state == Pin::STATE_CANCELLED)
-				{
-					// this will do!
-					$pin = array
-					(
-						'id'		=>	Hash::get($testPin, 'pin_id'),
-						'pin'		=>	Hash::get($testPin, 'pin'),
-						'isActive'	=>	$state == Pin::STATE_ENROLL ? true : false,
-					);
-					break;
-				}
+				$pin = array
+				(
+					'id'		=>	Hash::get($rawMemberInfo, 'Pin.pin_id'),
+					'pin'		=>	Hash::get($rawMemberInfo, 'Pin.pin'),
+					'isActive'	=>	$state == Pin::STATE_ENROLL ? true : false,
+				);
 			}
 		}
 		// send this to the view
 		$this->set('pin', $pin);
-
-
-
-
-		
-		
 	}
 
 

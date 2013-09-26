@@ -33,6 +33,10 @@
 					'className' => 'Account',
 					'foreignKey' => 'account_id',
 			),
+			'Pin' => array(
+					'className' => 'Pin',
+					'foreignKey' => 'pin_id',
+			)
 		);
 
 		//! We have many StatusUpdate, and many Pins (although in practice is it rare to have more than one pin)
@@ -44,9 +48,6 @@
 	    		'order' => 'StatusUpdate.timestamp DESC',
 	    		'limit'	=> '1',	
 	    	),
-	    	'Pin' => array(
-	            'className' => 'Pin',
-	        ),
 	        'RfidTag'	=>	array(
 	        	'order' => 'RfidTag.state ASC',
 	        	'className'	=>	'RfidTag',
@@ -496,19 +497,13 @@
 
     		$balance = Hash::get($memberInfo, 'Member.balance');
     		$creditLimit = Hash::get($memberInfo, 'Member.credit_limit');
-    		$pins = array();
     		if(array_key_exists('Pin', $memberInfo))
     		{
-	    		foreach ($memberInfo['Pin'] as $pin) 
-	    		{
-	    			array_push($pins, 
-	    				array(
-	    					'id' => Hash::get($pin, 'pin_id'),
-	    					'pin' => Hash::get($pin, 'pin'),
-	    					'state' => Hash::get($pin, 'state'),
-	    				)
-	    			);
-	    		}
+    			$pin = array(
+					'id' => Hash::get($memberInfo, 'Pin.pin_id'),
+					'pin' => Hash::get($memberInfo, 'Pin.pin'),
+					'state' => Hash::get($memberInfo, 'Pin.state'),
+    			);
 	    	}
 
     		$paymentRef = Hash::get($memberInfo, 'Account.payment_ref');
@@ -539,7 +534,7 @@
 				'paymentRef'=> $paymentRef,
 				'balance' => $balance,
 				'creditLimit' => $creditLimit,
-				'pin' => $pins,
+				'pin' => $pin,
 				'address' => $address,
 				'contactNumber' => $contactNumber,
 				'lastStatusUpdate' => $lastStatusUpdate,

@@ -104,12 +104,7 @@
 			Pin
 		</dt>
 		<dd>
-			<?php 
-				foreach($member['pin'] as $pin)
-				{
-					echo $pin['pin'] . '<br/>';	
-				}
-			?>
+			<?php echo $member['pin']['pin'] . '<br/>';?>
 		</dd>
 	<?php endif; ?>
 
