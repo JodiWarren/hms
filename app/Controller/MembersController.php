@@ -1272,10 +1272,10 @@
 			// We might have a debug config here to force requests to be local
 			App::uses('PhpReader', 'Configure');
 			Configure::config('default', new PhpReader());
-			Configure::load('debug', 'default');
 
 			try
 			{
+				Configure::load('debug', 'default');
 				$ip = Configure::read('forceRequestIp');
 				if (!isset($ip)) {
 					throw new ConfigureException('IP not in config file');
