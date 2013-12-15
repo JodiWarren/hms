@@ -1166,14 +1166,14 @@
 					'member_id',
 					'member_status', 
 					'unlock_text', 
-					'credit_limit', 
-					'join_date' 
+					'credit_limit',
+					'join_date',
+					// pin ID here??
 				), 
 				'Pin' => array(
 					'unlock_text', 
 					'pin', 
-					'state', 
-					'member_id'
+					'state',
 				)
 			);
 
