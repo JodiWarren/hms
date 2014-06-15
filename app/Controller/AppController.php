@@ -29,7 +29,7 @@ class AppController extends Controller {
 
 	const VERSION_MAJOR = 0;
 	const VERSION_MINOR = 3;
-	const VERSION_BUILD = 3;
+	const VERSION_BUILD = 5;
 
 /**
  * List of helpers views rendered from this controller will have access to.
@@ -89,6 +89,7 @@ class AppController extends Controller {
 		$this->__addMainNav('Mailing Lists', array( 'plugin' => null, 'controller' => 'mailinglists', 'action' => 'index' ), array(Group::FULL_ACCESS, Group::MEMBERSHIP_ADMIN), null);
 		$this->__addMainNav('Snackspace', array( 'plugin' => null, 'controller' => 'snackspace', 'action' => 'history' ), null, array(Status::CURRENT_MEMBER, Status::EX_MEMBER));
 		$this->__addMainNav('MemberVoice', array( 'plugin' => 'membervoice', 'controller' => 'ideas', 'action' => 'index' ), null, null);
+		$this->__addMainNav('Tools', array( 'plugin' => 'tools', 'controller' => 'tools', 'action' => 'index' ), null, null);
 	}
 
 /**
@@ -96,13 +97,14 @@ class AppController extends Controller {
  * @param  string $title Text to display with the link.
  * @param  string[] $link Array to pass to the HtmlHelper to construct the link when rendering.
  * @param  int[]|null $access Array of group ids that have access to this link, if null, all groups have access to link.
+ * @param  int[]|null $statuses A list of status ids, a member must be in one of these statuses for this link to be visible.
  */
-	private function __addMainNav($title, $link, $access, $statii) {
+	private function __addMainNav($title, $link, $access, $statuses) {
 		$this->__mainNav[] = array(
 								'title'		=>	$title,
 								'link'		=>	$link,
 								'access'	=>	$access,
-								'statii'	=>	$statii
+								'statuses'	=>	$statuses
 								);
 	}
 
@@ -135,9 +137,9 @@ class AppController extends Controller {
 
 			// Apply restrictions based on member status, if applicable
 			if ($allowed) {
-				if ($nav['statii'] != '') {
+				if ($nav['statuses'] != '') {
 					$allowed = false;
-					foreach ($nav['statii'] as $status) {
+					foreach ($nav['statuses'] as $status) {
 						if ($this->Member->getStatusForMember($userId) == $status) {
 							$allowed = true;
 						}
@@ -190,6 +192,7 @@ class AppController extends Controller {
 			$this->set('userMessage', $userMessage);
 			$this->set('memberId', $loggedInMemberId);
 			$this->set('username', $this->Member->getUsernameForMember($this->Auth->user()));
+			$this->set('email', $this->Member->getEmailForMember($this->Auth->user()));
 		}
 
 		$jsonData = json_decode(file_get_contents('http://lspace.nottinghack.org.uk/status/status.php'));
@@ -247,7 +250,6 @@ class AppController extends Controller {
 		}
 
 		$email = $this->email;
-		$email->config('smtp');
 		$email->from(array('membership@nottinghack.org.uk' => 'Nottinghack Membership'));
 		$email->sender(array('membership@nottinghack.org.uk' => 'Nottinghack Membership'));
 		$email->emailFormat('html');
@@ -255,6 +257,22 @@ class AppController extends Controller {
 		$email->subject($subject);
 		$email->template($template);
 		$email->viewVars($viewVars);
+
+		$emailDebugDirectory = null;
+		try {
+			Configure::load('debug');
+			$emailDebugDirectory = Configure::read('emailDebugDirectory');
+		} catch(ConfigureException $e) {
+			$emailDebugDirectory = null;
+		}
+		if ($emailDebugDirectory != null) {
+			$email->transport('Debug');
+			$emailContents = $email->send();
+			$this->__writeEmailContents($emailContents, $emailDebugDirectory);
+			return true;
+		}
+
+		$email->config('smtp');
 		return $email->send();
 	}
 
@@ -266,5 +284,45 @@ class AppController extends Controller {
 	protected function _getLoggedInMemberId() {
 		Controller::loadModel('Member');
 		return $this->Member->getIdForMember($this->Auth->user());
+	}
+
+/**
+ * Write an e-mail to a file.
+ * @param array $data Aray of e-mail data.
+ * @param string $toFolder The folder to save to e-mail to.
+ */
+	private function __writeEmailContents($data, $toFolder) {
+		$headers = $this->__splitEmailHeaders($data['headers']);
+		$data['headers'] = $headers;
+		$subject = $headers['Subject'];
+
+		$numEmailFiles = $this->__countFilesInFolder($toFolder);
+		$filepath = sprintf('%s/%03d_%s.js', $toFolder, $numEmailFiles, $subject);
+		file_put_contents($filepath, json_encode($data, JSON_PRETTY_PRINT));
+	}
+
+/**
+ * Given a list of headers, split them into an assoc array.
+ * @param string $headers String containing all header info.
+ * @return array An assoc array of headers.
+ */
+	private function __splitEmailHeaders($headers) {
+		$arrayHeaders = array();
+		foreach (explode("\r\n", $headers) as $header) {
+			$headerParts = explode(':', $header);
+			$arrayHeaders[$headerParts[0]] = trim($headerParts[1]);
+		}
+
+		return $arrayHeaders;
+	}
+
+/**
+ * Given the path to a directory, return the number of files in said directory
+ * @param string $folder Path to folder to count files in.
+ * @return int The number of files in the folder.
+ */
+	private function __countFilesInFolder($folder) {
+		$iter = new FilesystemIterator($folder, FilesystemIterator::SKIP_DOTS);
+		return iterator_count($iter);
 	}
 }

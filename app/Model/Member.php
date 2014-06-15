@@ -111,7 +111,7 @@ class Member extends AppModel {
 			'length' => array(
 				'rule' => array('between', 1, 100),
 				'required' => true,
-				'message' => 'Firstname must be between 1 and 100 characters long',
+				'message' => 'Email must be between 1 and 100 characters long',
 			),
 			'content' => array(
 				'rule' => 'email',
@@ -460,7 +460,9 @@ class Member extends AppModel {
 		/*
 			Data should be presented to the view in an array like so:
 			[id] => member id
-			[name] => member name
+			[bestName] => The name of the member, or the username, or the e-mail (depending on what data we have)
+			[firstname] => member first name
+			[surname] => member surname
 			[username] => member username
 			[email] => member email
 			[groups] =>
@@ -524,12 +526,17 @@ class Member extends AppModel {
 
 		$balance = Hash::get($memberInfo, 'Member.balance');
 		$creditLimit = Hash::get($memberInfo, 'Member.credit_limit');
-		if(array_key_exists('Pin', $memberInfo)) {
-			$pin = array(
-				'id' => Hash::get($memberInfo, 'Pin.pin_id'),
-				'pin' => Hash::get($memberInfo, 'Pin.pin'),
-				'state' => Hash::get($memberInfo, 'Pin.state'),
-			);
+		$pins = array();
+		if (array_key_exists('Pin', $memberInfo)) {
+			foreach ($memberInfo['Pin'] as $pin) {
+				array_push($pins,
+					array(
+						'id' => Hash::get($pin, 'pin_id'),
+						'pin' => Hash::get($pin, 'pin'),
+						'state' => Hash::get($pin, 'state'),
+					)
+				);
+			}
 		}
 
 		$paymentRef = Hash::get($memberInfo, 'Account.payment_ref');
@@ -546,8 +553,17 @@ class Member extends AppModel {
 			$lastStatusUpdate = $this->StatusUpdate->formatStatusUpdate(Hash::get($memberInfo, 'StatusUpdate.0.id'));
 		}
 
+		$bestName = $email;
+		if (isset($username)) {
+			$bestName = $username;
+		}
+		if (isset($firstname) && isset($surname)) {
+			$bestName = $firstname . ' ' . $surname;
+		}
+
 		$allValues = array(
 			'id' => $id,
+			'bestName' => $bestName,
 			'firstname' => $firstname,
 			'surname' => $surname,
 			'username' => $username,
