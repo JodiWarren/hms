@@ -99,8 +99,6 @@
 				array( 'name' => 'sendContactDetailsReminder', 		'params' => array(), 			'access' => array( 'fullAccessMember', 'memberAdminMember', 'membershipTeamMember' ) ),
 				array( 'name' => 'sendSoDetailsReminder', 			'params' => array(), 			'access' => array( 'fullAccessMember', 'memberAdminMember', 'membershipTeamMember' ) ),
 				array( 'name' => 'addExistingMember', 				'params' => array(), 			'access' => array( 'fullAccessMember', 'memberAdminMember' ) ),
-				array( 'name' => 'uploadCsv', 						'params' => array(), 			'access' => array( 'fullAccessMember', 'memberAdminMember' ) ),
-
 				array( 'name' => 'changePassword', 					'params' => array('ourId'), 	'access' => array( 'fullAccessMember', 'memberAdminMember', 'normalMember', 'membershipTeamMember' ) ),
 				array( 'name' => 'changePassword', 					'params' => array(), 			'access' => array( 'fullAccessMember', 'memberAdminMember' ) ),
 
