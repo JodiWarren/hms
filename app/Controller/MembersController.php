@@ -63,7 +63,6 @@ class MembersController extends AppController {
 			case 'acceptDetails':
 			case 'rejectDetails':
 			case 'addExistingMember':
-			case 'uploadCsv':
 			case 'emailMembersWithStatus':
 				return $memberIsMembershipAdmin;
 
